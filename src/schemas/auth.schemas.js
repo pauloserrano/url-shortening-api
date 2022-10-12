@@ -5,7 +5,7 @@ const signUpSchema = joi.object({
         .max(50).required(),
 
     email: joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+        .email({ minDomainSegments: 2 })
         .required(),
 
     password: joi.string()

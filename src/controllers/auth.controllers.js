@@ -10,11 +10,13 @@ const { USERS, SESSIONS } = FIELDS
 
 const signIn = (req, res) => {
     const { user } = res.locals
+    const token = nanoid()
 
     try {
         connection.query(`
             INSERT INTO ${TABLES.SESSIONS} (${SESSIONS.USER_ID}, ${SESSIONS.TOKEN}) VALUES ($1, $2);
-        `, [user.id, nanoid()])
+        `, [user.id, token])
+        res.status(STATUS.OK).send({ token })
         
     } catch (error) {
         res.status(STATUS.BAD_REQUEST).send(error)
