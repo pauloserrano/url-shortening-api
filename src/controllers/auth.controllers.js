@@ -12,6 +12,11 @@ const signIn = (req, res) => {
     const { user } = res.locals
     const token = nanoid()
 
+    if (!user){
+        res.sendStatus(STATUS.UNAUTHORIZED)
+        return
+    }
+
     try {
         connection.query(`
             INSERT INTO ${TABLES.SESSIONS} (${SESSIONS.USER_ID}, ${SESSIONS.TOKEN}) VALUES ($1, $2);
@@ -25,8 +30,14 @@ const signIn = (req, res) => {
 
 
 const signUp = async (req, res) => {
+    const { user } = res.locals
     const { name, email, password } = req.body
     const hash = await bcrypt.hash(password, 10)
+
+    if (user){
+        res.sendStatus(STATUS.CONFLICT)
+        return
+    }
 
     try {
         connection.query(`

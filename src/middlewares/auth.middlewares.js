@@ -6,7 +6,7 @@ import { FIELDS } from "../enums/fields.js"
 import { STATUS } from "../enums/status.js"
 
 
-const { USERS } = FIELDS
+const { USERS, SESSIONS } = FIELDS
 
 const validateSignIn = async (req, res, next) => {
     const { email, password } = req.body
@@ -21,31 +21,7 @@ const validateSignIn = async (req, res, next) => {
         return
     }
 
-    try {
-        const { rows: [ user ] } = await connection.query(`
-            SELECT * FROM ${TABLES.USERS} WHERE ${USERS.EMAIL}=$1;
-        `, [email])
-    
-        if (!user){
-            res.sendStatus(STATUS.UNAUTHORIZED)
-            return
-
-        } else {
-            res.locals.user = user
-        }
-
-        const validPassword = await bcrypt.compare(password, user.password)
-
-        if (!validPassword){
-            res.sendStatus(STATUS.UNAUTHORIZED)
-            return
-        }
-    
-        next()
-        
-    } catch (error) {
-        res.status(STATUS.BAD_REQUEST).send(error)
-    }
+    next()
 }
 
 
@@ -62,16 +38,58 @@ const validateSignUp = async (req, res, next) => {
         return
     }
 
+    next()
+}
+
+
+const checkUserByEmail = async (req, res, next) => {
+    const { email } = req.body
+
     try {
         const { rows: [ user ] } = await connection.query(`
             SELECT * FROM ${TABLES.USERS} WHERE ${USERS.EMAIL}=$1;
         `, [email])
-        
-        if (user){
-            res.sendStatus(STATUS.CONFLICT)
-            return
-        } 
     
+        if (user){ 
+            res.locals.user = user 
+        }
+
+        next()
+        
+    } catch (error) {
+        res.status(STATUS.BAD_REQUEST).send(error)
+    }
+}
+
+
+const passwordIsValid = async (req, res, next) => {
+    const { user } = res.locals
+    const { password } = req.body
+    const validPassword = await bcrypt.compare(password, user.password)
+
+    if (!validPassword){
+        res.sendStatus(STATUS.UNAUTHORIZED)
+        return
+    }
+
+    next()
+}
+
+
+const tokenIsValid = async (req, res, next) => {
+    const token = req.headers.authorization?.replace('Bearer ', '')
+
+    try {
+        const { rows: [ session ] } = await connection.query(`
+            SELECT * FROM ${TABLES.SESSIONS} WHERE ${SESSIONS.TOKEN}=$1
+        `, [token])
+        
+        if (!session){
+            res.sendStatus(STATUS.UNAUTHORIZED)
+            return
+        }
+
+        res.locals.session = session
         next()
         
     } catch (error) {
@@ -80,4 +98,4 @@ const validateSignUp = async (req, res, next) => {
 }
 
 
-export { validateSignIn, validateSignUp }
+export { validateSignIn, validateSignUp, passwordIsValid, checkUserByEmail, tokenIsValid }

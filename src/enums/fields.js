@@ -14,7 +14,7 @@ const FIELDS = Object.freeze({
         CREATED_AT: '"createdAt"'
     },
 
-    LINKS: {
+    URLS: {
         ID: "id",
         USER_ID: '"userId"',
         SHORT_URL: '"shortUrl"',
