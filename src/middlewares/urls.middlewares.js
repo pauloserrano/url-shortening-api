@@ -20,7 +20,7 @@ const validateUrl = (req, res, next) => {
 }
 
 
-const validateShortUrl = async (req, res, next) => {
+const validateShortUrlById = async (req, res, next) => {
     const { id } = req.params
     
     try {
@@ -42,4 +42,26 @@ const validateShortUrl = async (req, res, next) => {
 }
 
 
-export { validateUrl, validateShortUrl }
+const validateShortUrl = async (req, res, next) => {
+    const { shortUrl } = req.params
+    
+    try {
+        const { rows: [ url ] } = await connection.query(`
+            SELECT * FROM ${TABLES.URLS} WHERE ${URLS.SHORT_URL}=$1;
+        `, [shortUrl])
+
+        if (!url){
+            res.sendStatus(STATUS.NOT_FOUND)
+            return
+        } 
+        
+        res.locals.shortUrl = url
+        next()
+
+    } catch (error) {
+        res.status(STATUS.SERVER_ERROR).send(error)
+    }
+}
+
+
+export { validateUrl, validateShortUrlById, validateShortUrl }

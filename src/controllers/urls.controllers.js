@@ -30,4 +30,21 @@ const getUrl = (req, res) => {
 }
 
 
-export { createUrl, getUrl }
+const openUrl = (req, res) => {
+    const { id, url } = res.locals.shortUrl
+    
+    try {
+        connection.query(`
+            UPDATE ${TABLES.URLS} SET ${URLS.VISIT_COUNT} = ${URLS.VISIT_COUNT} + 1
+            WHERE ${URLS.ID}=$1;
+        `, [id])
+        
+        res.redirect(url)
+        
+    } catch (error) {
+        res.status(STATUS.SERVER_ERROR).send(error)
+    }
+}
+
+
+export { createUrl, getUrl, openUrl }
