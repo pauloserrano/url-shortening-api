@@ -15,7 +15,7 @@ const createUrl = async (req, res) => {
         connection.query(`
             INSERT INTO ${TABLES.URLS} (${URLS.USER_ID}, ${URLS.SHORT_URL}, ${URLS.URL}) VALUES ($1, $2, $3);
         `, [session.userId, shortUrl, url])
-        
+
         res.sendStatus(STATUS.CREATED)
         
     } catch (error) {
@@ -23,4 +23,11 @@ const createUrl = async (req, res) => {
     }
 }
 
-export { createUrl }
+
+const getUrl = (req, res) => {
+    const { url: { id, shortUrl, url }} = res.locals
+    res.send({ id, shortUrl, url })
+}
+
+
+export { createUrl, getUrl }
