@@ -5,11 +5,12 @@ import express, { json } from "express"
 import cors from "cors"
 import authRoutes from "./routes/auth.routes.js"
 import urlsRoutes from "./routes/urls.routes.js"
+import usersRoutes from "./routes/users.routes.js"
 
 
 const PORT = process.env.PORT || 5000
 const app = express()
 app.use(cors(), json())
-app.use(authRoutes, urlsRoutes)
+app.use(authRoutes, urlsRoutes, usersRoutes)
 
 app.listen(PORT, () => `Magic happens on ${PORT}`)

@@ -64,4 +64,21 @@ const validateShortUrl = async (req, res, next) => {
 }
 
 
-export { validateUrl, validateShortUrlById, validateShortUrl }
+const getUserUrls = async (req, res, next) => {
+    const { userId } = res.locals.session
+
+    try {
+        const { rows: urls } = await connection.query(`
+            SELECT * FROM ${TABLES.URLS} WHERE ${URLS.USER_ID}=$1;
+        `, [userId])
+
+        res.locals.urls = urls
+        next()
+        
+    } catch (error) {
+        res.status(STATUS.SERVER_ERROR).send(error)
+    }
+}
+
+
+export { validateUrl, validateShortUrlById, validateShortUrl, getUserUrls }
