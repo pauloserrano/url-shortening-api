@@ -47,4 +47,26 @@ const openUrl = (req, res) => {
 }
 
 
-export { createUrl, getUrl, openUrl }
+const deleteUrl = (req, res) => {
+    const { userId: sessionId } = res.locals.session
+    const { userId } = res.locals.url
+
+    if (sessionId !== userId){
+        res.sendStatus(STATUS.UNAUTHORIZED)
+        return
+    }
+
+    try {
+        connection.query(`
+            DELETE FROM ${TABLES.URLS} WHERE ${URLS.ID}=$1;
+        `, [userId])
+
+        res.sendStatus(STATUS.NO_CONTENT)
+        
+    } catch (error) {
+        res.status(STATUS.SERVER_ERROR).send(error)
+    }
+}
+
+
+export { createUrl, getUrl, openUrl, deleteUrl }
