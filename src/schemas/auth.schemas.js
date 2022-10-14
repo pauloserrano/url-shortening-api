@@ -20,8 +20,7 @@ const signInSchema = joi.object({
         .email({ minDomainSegments: 2 })
         .required(),
 
-    password: joi.string()
-        //.pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+    password: joi.any()
         .required()
 })
 
