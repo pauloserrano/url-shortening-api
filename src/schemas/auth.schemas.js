@@ -20,7 +20,7 @@ const signInSchema = joi.object({
         .email({ minDomainSegments: 2 })
         .required(),
 
-    password: joi.any()
+    password: joi.string()
         .required()
 })
 

@@ -16,7 +16,7 @@ const createUrl = async (req, res) => {
             INSERT INTO ${TABLES.URLS} (${URLS.USER_ID}, ${URLS.SHORT_URL}, ${URLS.URL}) VALUES ($1, $2, $3);
         `, [session.userId, shortUrl, url])
 
-        res.sendStatus(STATUS.CREATED)
+        res.status(STATUS.CREATED).send({ shortUrl })
         
     } catch (error) {
         res.status(STATUS.SERVER_ERROR).send(error)
@@ -59,7 +59,7 @@ const deleteUrl = (req, res) => {
     try {
         connection.query(`
             DELETE FROM ${TABLES.URLS} WHERE ${URLS.ID}=$1;
-        `, [userId])
+        `, [req.params.id])
 
         res.sendStatus(STATUS.NO_CONTENT)
         

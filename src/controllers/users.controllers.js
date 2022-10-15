@@ -9,6 +9,11 @@ const { USERS, URLS } = FIELDS
 const getUserData = (req, res) => {
     const { user, urls } = res.locals
 
+    if (!user){
+        res.sendStatus(STATUS.NOT_FOUND)
+        return
+    }
+
     res.status(STATUS.OK).send({
         id: user.id,
         name: user.name,
