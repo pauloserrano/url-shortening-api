@@ -1,5 +1,5 @@
 import connection from "../database/postgres.js"
-import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 import { signUpSchema, signInSchema } from "../schemas/auth.schemas.js"
 import { TABLES } from "../enums/tables.js"
 import { FIELDS } from "../enums/fields.js"
@@ -62,24 +62,12 @@ const checkUserByEmail = async (req, res, next) => {
 }
 
 
-const passwordIsValid = async (req, res, next) => {
-    const { user } = res.locals
-    const { password } = req.body
-    const validPassword = await bcrypt.compare(password, user.password)
-
-    if (!validPassword){
-        res.sendStatus(STATUS.UNAUTHORIZED)
-        return
-    }
-
-    next()
-}
-
-
 const tokenIsValid = async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '')
 
     try {
+        jwt.verify(token, process.env.TOKEN_SECRET)
+        
         const { rows: [ session ] } = await connection.query(`
             SELECT * FROM ${TABLES.SESSIONS} WHERE ${SESSIONS.TOKEN}=$1
         `, [token])
@@ -93,9 +81,12 @@ const tokenIsValid = async (req, res, next) => {
         next()
         
     } catch (error) {
+        connection.query(`
+            DELETE FROM ${TABLES.SESSIONS} WHERE ${SESSIONS.TOKEN}=$1;
+        `, [token])
         res.status(STATUS.SERVER_ERROR).send(error)
     }
 }
 
 
-export { validateSignIn, validateSignUp, passwordIsValid, checkUserByEmail, tokenIsValid }
+export { validateSignIn, validateSignUp, checkUserByEmail, tokenIsValid }

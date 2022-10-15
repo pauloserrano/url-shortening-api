@@ -20,7 +20,7 @@ const validateUrl = (req, res, next) => {
 }
 
 
-const validateShortUrlById = async (req, res, next) => {
+const getShortUrlById = async (req, res, next) => {
     const { id } = req.params
     
     try {
@@ -81,4 +81,4 @@ const getUserUrls = async (req, res, next) => {
 }
 
 
-export { validateUrl, validateShortUrlById, validateShortUrl, getUserUrls }
+export { validateUrl, getShortUrlById, validateShortUrl, getUserUrls }
